@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import { useEffect } from 'react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -12,10 +13,16 @@ const Auth = () => {
 
   const [currentUser, setCurrentUser] = useState('');
 
-  auth.onAuthStateChanged((user) => {
-    if (user) return setCurrentUser(user.email);
-    setCurrentUser('No user');
-  });
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) setCurrentUser(user.email);
+      else setCurrentUser('No user');
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const signIn = async () => {
     try {
